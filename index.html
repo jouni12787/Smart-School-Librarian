@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .container-box { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); border: 1px solid rgba(229,231,235,0.7); }
+        .action-button { transition: all 0.2s ease-in-out; }
+        .action-button:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen bg-gray-100">
+
+    <!-- School Name -->
+    <div class="max-w-4xl mx-auto mb-6 p-3 bg-white rounded-xl container-box text-center">
+        <h1 class="text-xl md:text-2xl font-extrabold text-blue-800">| al rahma high school |</h1>
+    </div>
+
+    <!-- Language Selector -->
+    <div class="max-w-4xl mx-auto mb-6 p-4 bg-white rounded-xl container-box text-center">
+        <label class="text-gray-600 font-medium mr-2">Language:</label>
+        <select id="languageSelect" class="p-2 border border-gray-300 rounded-lg">
+            <option value="en">English</option>
+            <option value="ar">العربية</option>
+        </select>
+    </div>
+
+    <!-- Main Controls -->
+    <div class="max-w-4xl mx-auto p-5 md:p-8 bg-white rounded-xl container-box mb-8">
+        <h2 class="text-2xl font-bold mb-6 text-gray-700" data-en="Book Transaction Center" data-ar="مركز معاملات الكتب">Book Transaction Center</h2>
+        
+        <div class="flex space-x-4 mb-6">
+            <button id="rentBtn" class="action-button flex-1 px-6 py-3 text-white font-semibold rounded-lg bg-green-600 hover:bg-green-700" data-en="RENT" data-ar="استعارة">RENT</button>
+            <button id="returnBtn" class="action-button flex-1 px-6 py-3 text-white font-semibold rounded-lg bg-red-600 hover:bg-red-700" data-en="RETURN" data-ar="إرجاع">RETURN</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="flex items-center gap-4">
+                <label class="text-gray-600 font-medium" data-en="Book ID:" data-ar="رقم الكتاب:">Book ID:</label>
+                <input type="number" id="bookIdInput" placeholder="e.g., 1023" class="w-full p-3 border border-gray-300 rounded-lg" required>
+            </div>
+            <div class="p-3 bg-gray-100 border border-gray-300 rounded-lg flex justify-between">
+                <span class="text-gray-600 font-medium" data-en="Date:" data-ar="التاريخ:">Date:</span>
+                <span id="currentDateDisplay" class="font-bold text-blue-800"></span>
+            </div>
+        </div>
+        
+        <h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2" data-en="Student Information" data-ar="معلومات الطالب">Student Information</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <input type="text" id="studentNameInput" placeholder="Name" data-en-placeholder="Name" data-ar-placeholder="الاسم" class="p-3 border border-gray-300 rounded-lg" required>
+            <input type="text" id="studentSurnameInput" placeholder="Surname" data-en-placeholder="Surname" data-ar-placeholder="اللقب" class="p-3 border border-gray-300 rounded-lg" required>
+            <select id="studentClassSelect" class="p-3 border border-gray-300 rounded-lg bg-white" required>
+                <option value="" data-en="Select Class" data-ar="اختر الصف">Select Class</option>
+                <option value="3rd Grade">3rd Grade</option>
+                <option value="4th Grade">4th Grade</option>
+                <option value="5th Grade">5th Grade</option>
+                <option value="6th Grade">6th Grade</option>
+                <option value="7th Grade">7th Grade</option>
+                <option value="8th Grade">8th Grade</option>
+                <option value="9th Grade">9th Grade</option>
+                <option value="10th Grade">10th Grade</option>
+                <option value="11th Grade">11th Grade</option>
+                <option value="12th Grade">12th Grade</option>
+            </select>
+        </div>
+        
+        <div id="messageBox" class="p-4 rounded-lg hidden"></div>
+    </div>
+
+    <!-- Book Inventory -->
+    <div class="max-w-4xl mx-auto p-5 md:p-8 bg-white rounded-xl container-box mb-8">
+        <h2 class="text-2xl font-bold mb-6 text-gray-700" data-en="BOOK INVENTORY" data-ar="مخزون الكتب">BOOK INVENTORY</h2>
+        <div id="bookInventory" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Books will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Active Rentals -->
+    <div class="max-w-4xl mx-auto p-5 md:p-8 bg-white rounded-xl container-box">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700" data-en="ACTIVE RENTALS" data-ar="الاستعارات النشطة">ACTIVE RENTALS</h2>
+        <div id="activeRentalsDisplay">
+            <!-- Active rentals will be shown here -->
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="customModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-sm">
+            <h3 id="modalTitle" class="text-xl font-bold mb-4"></h3>
+            <p id="modalMessage" class="mb-6"></p>
+            <button id="modalConfirm" class="px-4 py-2 bg-blue-800 text-white rounded-lg w-full" data-en="OK" data-ar="موافق">OK</button>
+        </div>
+    </div>
+
+<script>
+// Data
+let books = JSON.parse(localStorage.getItem('libraryBooks')) || [
+    {id: "1023", title: "The Great Gatsby", isAvailable: true},
+    {id: "4917", title: "To Kill a Mockingbird", isAvailable: true},
+    {id: "2560", title: "1984", isAvailable: true},
+    {id: "7381", title: "Pride and Prejudice", isAvailable: true},
+    {id: "5049", title: "Moby Dick", isAvailable: true},
+    {id: "8206", title: "War and Peace", isAvailable: true},
+    {id: "3154", title: "The Odyssey", isAvailable: true},
+    {id: "6792", title: "Jane Eyre", isAvailable: true},
+    {id: "9438", title: "Brave New World", isAvailable: true},
+    {id: "1675", title: "The Secret Garden", isAvailable: true}
+];
+
+let rentals = JSON.parse(localStorage.getItem('libraryRentals')) || [];
+let currentLanguage = localStorage.getItem('libraryLanguage') || 'en';
+
+// Language translations
+const translations = {
+    en: {
+        noRentals: "No active rentals currently.",
+        available: "Available",
+        rented: "Rented",
+        bookId: "Book ID",
+        bookTitle: "Book Title",
+        studentName: "Student Name",
+        class: "Class",
+        dateRented: "Date Rented",
+        error: "Error",
+        fillAllFields: "Please fill all fields",
+        bookNotFound: "Book not found",
+        bookAlreadyRented: "Book already rented",
+        bookNotRented: "Book not rented",
+        rentedSuccess: "Rented",
+        returnedSuccess: "Returned",
+        to: "to"
+    },
+    ar: {
+        noRentals: "لا توجد استعارات نشطة حالياً.",
+        available: "متاح",
+        rented: "مستعار",
+        bookId: "رقم الكتاب",
+        bookTitle: "عنوان الكتاب",
+        studentName: "اسم الطالب",
+        class: "الصف",
+        dateRented: "تاريخ الاستعارة",
+        error: "خطأ",
+        fillAllFields: "يرجى ملء جميع الحقول",
+        bookNotFound: "الكتاب غير موجود",
+        bookAlreadyRented: "الكتاب مستعار بالفعل",
+        bookNotRented: "الكتاب غير مستعار",
+        rentedSuccess: "تم الاستعارة",
+        returnedSuccess: "تم الإرجاع",
+        to: "إلى"
+    }
+};
+
+function saveData() {
+    localStorage.setItem('libraryBooks', JSON.stringify(books));
+    localStorage.setItem('libraryRentals', JSON.stringify(rentals));
+    updateBookInventory();
+    updateActiveRentals();
+}
+
+function updateLanguage() {
+    currentLanguage = document.getElementById('languageSelect').value;
+    localStorage.setItem('libraryLanguage', currentLanguage);
+    
+    // Update all elements with data attributes
+    document.querySelectorAll('[data-en]').forEach(element => {
+        const key = element.getAttribute(`data-${currentLanguage}`);
+        if (key) element.textContent = key;
+    });
+    
+    // Update placeholders
+    document.querySelectorAll('[data-en-placeholder]').forEach(element => {
+        const key = element.getAttribute(`data-${currentLanguage}-placeholder`);
+        if (key) element.placeholder = key;
+    });
+    
+    // Update active rentals table
+    updateActiveRentals();
+}
+
+function showModal(title, message) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalMessage').textContent = message;
+    document.getElementById('customModal').classList.remove('hidden');
+    document.getElementById('customModal').classList.add('flex');
+}
+
+function showMessage(text, isError = false) {
+    const box = document.getElementById('messageBox');
+    box.textContent = text;
+    box.className = `p-4 rounded-lg ${isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+    setTimeout(() => box.classList.add('hidden'), 3000);
+}
+
+function updateBookInventory() {
+    const container = document.getElementById('bookInventory');
+    const t = translations[currentLanguage];
+    
+    container.innerHTML = books.map(book => `
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex justify-between items-start mb-2">
+                <h3 class="font-bold ${book.isAvailable ? 'text-blue-800' : 'text-gray-500'}">${book.title}</h3>
+                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${book.id}</span>
+            </div>
+            <div class="${book.isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} text-xs px-2 py-1 rounded-full inline-block">
+                ${book.isAvailable ? t.available : t.rented}
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateActiveRentals() {
+    const container = document.getElementById('activeRentalsDisplay');
+    const activeRentals = rentals.filter(r => r.isActive);
+    const t = translations[currentLanguage];
+    
+    if (activeRentals.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 text-center py-4">${t.noRentals}</p>`;
+    } else {
+        container.innerHTML = `
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">${t.bookId}</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">${t.bookTitle}</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">${t.studentName}</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">${t.class}</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">${t.dateRented}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${activeRentals.map(rental => `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${rental.bookId}</td>
+                                <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700">${rental.bookTitle}</td>
+                                <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700">${rental.studentName} ${rental.surname}</td>
+                                <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700">${rental.class}</td>
+                                <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500">${rental.rentDate}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+}
+
+function handleRent() {
+    const bookId = document.getElementById('bookIdInput').value;
+    const name = document.getElementById('studentNameInput').value;
+    const surname = document.getElementById('studentSurnameInput').value;
+    const studentClass = document.getElementById('studentClassSelect').value;
+    const t = translations[currentLanguage];
+
+    if (!bookId || !name || !surname || !studentClass) {
+        return showModal(t.error, t.fillAllFields);
+    }
+
+    const book = books.find(b => b.id === bookId);
+    if (!book) return showModal(t.error, t.bookNotFound);
+    if (!book.isAvailable) return showModal(t.error, t.bookAlreadyRented);
+
+    book.isAvailable = false;
+    rentals.push({
+        bookId, 
+        bookTitle: book.title,
+        studentName: name, 
+        surname, 
+        class: studentClass,
+        rentDate: document.getElementById('currentDateDisplay').textContent,
+        isActive: true
+    });
+
+    saveData();
+    showMessage(`${t.rentedSuccess} "${book.title}" ${t.to} ${name} ${surname}`);
+    clearInputs();
+}
+
+function handleReturn() {
+    const bookId = document.getElementById('bookIdInput').value;
+    const t = translations[currentLanguage];
+    
+    if (!bookId) return showModal(t.error, t.fillAllFields);
+
+    const book = books.find(b => b.id === bookId);
+    if (!book) return showModal(t.error, t.bookNotFound);
+    if (book.isAvailable) return showModal(t.error, t.bookNotRented);
+
+    book.isAvailable = true;
+    const rental = rentals.find(r => r.bookId === bookId && r.isActive);
+    if (rental) rental.isActive = false;
+
+    saveData();
+    showMessage(`${t.returnedSuccess} "${book.title}"`);
+    document.getElementById('bookIdInput').value = '';
+}
+
+function clearInputs() {
+    document.getElementById('bookIdInput').value = '';
+    document.getElementById('studentNameInput').value = '';
+    document.getElementById('studentSurnameInput').value = '';
+    document.getElementById('studentClassSelect').value = '';
+}
+
+// Initialize
+document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString();
+document.getElementById('languageSelect').value = currentLanguage;
+document.getElementById('modalConfirm').onclick = () => document.getElementById('customModal').classList.add('hidden');
+document.getElementById('rentBtn').onclick = handleRent;
+document.getElementById('returnBtn').onclick = handleReturn;
+document.getElementById('languageSelect').addEventListener('change', updateLanguage);
+
+// Initial render
+updateLanguage();
+updateBookInventory();
+updateActiveRentals();
+</script>
+</body>
+</html>
